@@ -248,6 +248,45 @@ impl Nullable for CXVersion {
 // Functions
 //================================================
 
+#[derive(Debug)]
+pub struct ClangString {
+    inner: CXString
+}
+
+impl ClangString {
+    #[inline]
+    fn new(str: CXString) -> Self {
+        Self { inner: str }
+    }
+
+    #[inline]
+    pub fn new_non_empty(str: CXString) -> Option<Self> {
+        let res = Self::new(str);
+        if res.as_str().is_empty() {
+            None
+        } else {
+            Some(res)
+        }
+    }
+
+    pub fn as_str(&self) -> &str {
+        let cstr = unsafe { CStr::from_ptr(clang_getCString(self.inner)) };
+        cstr.to_str().expect("invalid Rust string")
+    }
+}
+
+impl Drop for ClangString {
+    fn drop(&mut self) {
+        unsafe { clang_disposeString(self.inner) }
+    }
+}
+
+impl Into<String> for ClangString {
+    fn into(self) -> String {
+        self.as_str().to_owned()
+    }
+}
+
 pub fn addressof<T>(value: &mut T) -> *mut c_void {
     (value as *mut T) as *mut c_void
 }

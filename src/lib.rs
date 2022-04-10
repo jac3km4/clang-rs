@@ -53,6 +53,7 @@ use diagnostic::{Diagnostic};
 use documentation::{Comment};
 use source::{File, Module, SourceLocation, SourceRange};
 use token::{Token};
+use utility::ClangString;
 use utility::{FromError, Nullable};
 
 mod error;
@@ -1867,6 +1868,14 @@ impl<'tu> Entity<'tu> {
         unsafe { utility::to_string_option(clang_getCursorDisplayName(self.raw)) }
     }
 
+    /// Returns the display name of this AST entity, if any.
+    ///
+    /// The display name of an entity contains additional information that helps identify the
+    /// entity.
+    pub fn get_display_name_raw(&self) -> Option<ClangString> {
+        unsafe { ClangString::new_non_empty(clang_getCursorDisplayName(self.raw)) }
+    }
+
     #[cfg(feature="clang_7_0")]
     /// Returns the pretty printer for this declaration.
     pub fn get_pretty_printer(&self) -> PrettyPrinter {
@@ -1929,6 +1938,11 @@ impl<'tu> Entity<'tu> {
     /// Returns the comment associated with this AST entity, if any.
     pub fn get_comment(&self) -> Option<String> {
         unsafe { utility::to_string_option(clang_Cursor_getRawCommentText(self.raw)) }
+    }
+
+    /// Returns the comment associated with this AST entity, if any.
+    pub fn get_comment_raw(&self) -> Option<ClangString> {
+        unsafe { ClangString::new_non_empty(clang_Cursor_getRawCommentText(self.raw)) }
     }
 
     ///  Returns the parsed comment associated with this declaration, if applicable.
@@ -2085,6 +2099,11 @@ impl<'tu> Entity<'tu> {
     /// Returns the name of this AST entity, if any.
     pub fn get_name(&self) -> Option<String> {
         unsafe { utility::to_string_option(clang_getCursorSpelling(self.raw)) }
+    }
+
+    /// Returns the name of this AST entity, if any.
+    pub fn get_name_raw(&self) -> Option<ClangString> {
+        unsafe { ClangString::new_non_empty(clang_getCursorSpelling(self.raw)) }
     }
 
     /// Returns the source ranges of the name of this AST entity.

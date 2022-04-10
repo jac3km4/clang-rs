@@ -36,7 +36,7 @@ static = ["clang-sys/static"]
 [dependencies]
 
 clang-sys = "1"
-libc = "0.2.39"
+libc = "0.2"
 
 [[test]]
 
