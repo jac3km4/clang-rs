@@ -259,19 +259,22 @@ impl ClangString {
         Self { inner: str }
     }
 
-    #[inline]
     pub fn new_non_empty(str: CXString) -> Option<Self> {
         let res = Self::new(str);
-        if res.as_str().is_empty() {
+        if res.as_cstr().to_bytes().is_empty() {
             None
         } else {
             Some(res)
         }
     }
 
+    #[inline]
+    fn as_cstr(&self) -> &CStr {
+        unsafe { CStr::from_ptr(clang_getCString(self.inner)) }
+    }
+
     pub fn as_str(&self) -> &str {
-        let cstr = unsafe { CStr::from_ptr(clang_getCString(self.inner)) };
-        cstr.to_str().expect("invalid Rust string")
+        self.as_cstr().to_str().expect("invalid Rust string")
     }
 }
 
